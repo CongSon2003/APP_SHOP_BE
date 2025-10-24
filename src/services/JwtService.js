@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const { CONFIG_MESSAGE_ERRORS } = require("../configs");
 dotenv.config();
 
+// Tạo Access Token
 const generateToken = async (payload, secretKey, expire) => {
   const token = jwt.sign(
     {
@@ -15,6 +16,7 @@ const generateToken = async (payload, secretKey, expire) => {
   return token;
 };
 
+// Làm mới Access Token
 const refreshTokenJwtService = (token) => {
   return new Promise((resolve, reject) => {
     try {

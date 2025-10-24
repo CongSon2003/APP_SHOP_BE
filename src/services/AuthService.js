@@ -117,6 +117,10 @@ const logoutUser = (res, accessToken) => {
   return new Promise(async (resolve, reject) => {
     try {
       // addToBlacklist(accessToken);
+
+      // Xóa refreshToken khi người dùng đăng xuất
+      res.clearCookie('refresh_token');
+      
       resolve({
         status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
         message: "logout Success",
@@ -176,11 +180,13 @@ const updateAuthMe = (id, data, isPermission) => {
           data: null,
           statusMessage: "Error",
         });
-        return
+        return;
       }
 
       if (data.addresses) {
-        const defaultAddresses = data.addresses.filter(address => address.isDefault);
+        const defaultAddresses = data.addresses.filter(
+          (address) => address.isDefault
+        );
         if (defaultAddresses.length > 1) {
           resolve({
             status: CONFIG_MESSAGE_ERRORS.INVALID.status,

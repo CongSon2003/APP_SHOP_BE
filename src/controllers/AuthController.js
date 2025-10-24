@@ -47,7 +47,6 @@ const registerUser = async (req, res) => {
       status: statusMessage,
     });
   } catch (e) {
-    console.log("e", e);
     return res.status(CONFIG_MESSAGE_ERRORS.INTERNAL_ERROR.status).json({
       message: "Internal Server Error",
       data: null,
@@ -100,12 +99,17 @@ const loginUser = async (req, res) => {
       access_token,
       refresh_token,
     } = response;
+
+    // Gửi Refresh Token qua HttpOnly Cookie để bảo mật
+    // server đang lưu refresh_token trình duyệt của người dùng
     res.cookie("refresh_token", refresh_token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "strict",
+      httpOnly: true, // Cookie này chỉ có thể được truy cập bởi server.
+      secure: false, // Chuyển thành true nếu dùng HTTPS
+      sameSite: "strict", // Trình duyệt chỉ gửi cookie này nếu yêu cầu được thực hiện từ chính trang web đã tạo ra cookie đó.
       path: "/",
     });
+
+    
     return res.status(status).json({
       typeError,
       data: {
@@ -156,6 +160,9 @@ const refreshToken = async (req, res) => {
 const logoutUser = async (req, res) => {
   try {
     const accessToken = req.headers?.authorization?.split(" ")[1];
+    const refreshToken = req.cookies.refreshToken;
+    console.log(refreshToken);
+    console.log("re:", req.cookies.refreshToken);
     const response = await AuthService.logoutUser(res, accessToken);
     const { data, status, typeError, message, statusMessage } = response;
     return res.status(status).json({
